@@ -1,0 +1,4 @@
+D:\dev\Cauca.EntityUpdater\Cauca.EntityUpdater.Tests\bin\Debug\netcoreapp3.1\Cauca.EntityUpdater.dll
+D:\dev\Cauca.EntityUpdater\Cauca.EntityUpdater.Tests\obj\Debug\netcoreapp3.1\Cauca.EntityUpdater.Tests.csprojAssemblyReference.cache
+D:\dev\Cauca.EntityUpdater\Cauca.EntityUpdater.Tests\obj\Debug\netcoreapp3.1\Cauca.EntityUpdater.Tests.AssemblyInfoInputs.cache
+D:\dev\Cauca.EntityUpdater\Cauca.EntityUpdater.Tests\obj\Debug\netcoreapp3.1\Cauca.EntityUpdater.Tests.AssemblyInfo.cs
