@@ -6,36 +6,13 @@ using System.Reflection;
 
 namespace Cauca.EntityUpdater
 {
-    public interface IBaseEntity<T> where T : IComparable
-	{
-        T Id { get; set; }
-        bool IsActive { get; set; }
-
-        
-	}
-
-    /*public class ss
+    public class EntityUpdater<TBaseType> where TBaseType : BaseModel
     {
-        public string Id { get; set; }
-        }
+        private readonly List<BaseModel> entitiesToAdd = new List<BaseModel>();
+        private readonly List<BaseModel> entitiesToRemove = new List<BaseModel>();
 
-        public void d()
-	    {
-            new EntityUpdater<ss>().UpdateFromList(new List<ss>(), new List<ss>(), (item1, item2) => item1.id
-	    } )
-	    }
-    }*/
-
-    public class EntityUpdater<TBaseType> where TBaseType : class, new()
-    {
-        private readonly List<TBaseType> entitiesToAdd = new List<TBaseType>();
-        private readonly List<TBaseType> entitiesToRemove = new List<TBaseType>();
-        private Func<TBaseType, TBaseType, bool> keyIsSameFunc;
-
-        public (List<TBaseType> entityToRemove, List<TBaseType> entityToAdd) UpdateFromList(
-	        IList updatedEntities, IList currentEntities, Func<TBaseType, TBaseType, bool> keyIsSameFunc)
+        public (List<BaseModel> entityToRemove, List<BaseModel> entityToAdd) UpdateFromList(IList updatedEntities, IList currentEntities)
         {
-	        this.keyIsSameFunc = keyIsSameFunc;
             AddOrUpdateEntities(updatedEntities, currentEntities);
             DeactivateItemsThatAreNotInSourceList(currentEntities, updatedEntities);
 
@@ -50,14 +27,14 @@ namespace Cauca.EntityUpdater
 
         private void AddOrUpdateEntryEntity(IList currentEntities, TBaseType entity)
         {
-            var currentEntity = currentEntities.OfType<TBaseType>().SingleOrDefault(e => keyIsSameFunc(e, entity));
+            var currentEntity = currentEntities.OfType<TBaseType>().SingleOrDefault(e => e.Id == entity.Id);
             if (currentEntity != null)
                 UpdateEntity(entity, currentEntity);
             else
                 entitiesToAdd.Add(entity);
         }
 
-        protected virtual void UpdateCopyableCollections(TBaseType source, TBaseType destination)
+        protected virtual void UpdateCopyableCollections(BaseModel source, BaseModel destination)
         {
             foreach (var property in GetCopyableCollection(source))
             {
@@ -70,7 +47,7 @@ namespace Cauca.EntityUpdater
 
         protected virtual void UpdateCollection(IList destination, IList source)
         {
-            foreach (var updatedEntity in source.OfType<TBaseType>())
+            foreach (var updatedEntity in source.OfType<BaseModel>())
             {
                 AddOrUpdateEntity(destination, updatedEntity);
             }
@@ -80,15 +57,20 @@ namespace Cauca.EntityUpdater
 
         protected virtual void DeactivateItemsThatAreNotInSourceList(IList current, IList updated)
         {
-            var entityToValidate = current.Count > 0 ? current[0] : updated[0];
+	        var list = GetItemsThatAreOnlyInCurrentList(current, updated);
+	        foreach (var entity in list)
+	        {
+		        entitiesToRemove.Add(entity);
+	        }
+
+           /* var entityToValidate = current.Count > 0 ? current[0] : updated[0];
 
             if (entityToValidate != null && entityToValidate.GetType().GetProperties().Any(p => p.Name == "IsActive"))
             {
                 var list = GetActiveItemsThatAreOnlyInCurrentList(current, updated);
                 foreach (var entity in list)
                 {
-	                PropertyInfo propertyInfo = entityToValidate.GetType().GetProperty("IsActive");
-                    propertyInfo.SetValue(entity, false);
+	                //entity.IsActive = false;
                 }
             }
             else
@@ -98,39 +80,27 @@ namespace Cauca.EntityUpdater
                 {
                     entitiesToRemove.Add(entity);
                 }
-            }
+            }*/
         }
 
-        private List<TBaseType> GetActiveItemsThatAreOnlyInCurrentList(IList current, IList updated)
+        private List<BaseModel> GetActiveItemsThatAreOnlyInCurrentList(IList current, IList updated)
         {
-            return current.OfType<TBaseType>().Where(e => EntityIsNotInList(updated, e) && IsPropertyActive(e) && ).ToList();
+            return current.OfType<BaseModel>().Where(e => EntityIsNotInList(updated, e)/* && e.IsActive*/).ToList();
         }
 
-        private bool IsPropertyActive(TBaseType entity)
+        private List<BaseModel> GetItemsThatAreOnlyInCurrentList(IList current, IList updated)
         {
-	        var isActiveValue = GetPropertyValueByPropertyName(entity, "IsActive");
-	        if (isActiveValue != null)
-		        return isActiveValue;
+            return current.OfType<BaseModel>().Where(e => EntityIsNotInList(updated, e)).ToList();
         }
 
-        private static object GetPropertyValueByPropertyName(object obj, string propertyName)
+        protected bool EntityIsNotInList(IList updated, BaseModel e)
         {
-	        return obj.GetType().GetProperty(propertyName)?.GetValue(obj, null);
+            return updated.OfType<BaseModel>().All(n => n.Id != e.Id);
         }
 
-        private List<TBaseType> GetItemsThatAreOnlyInCurrentList(IList current, IList updated)
+        protected virtual void AddOrUpdateEntity(IList currentEntities, BaseModel source)
         {
-            return current.OfType<TBaseType>().Where(e => EntityIsNotInList(updated, e)).ToList();
-        }
-
-        protected bool EntityIsNotInList(IList updated, TBaseType e)
-        {
-            return updated.OfType<TBaseType>().All(n => !keyIsSameFunc(n, e));
-        }
-
-        protected virtual void AddOrUpdateEntity(IList currentEntities, TBaseType source)
-        {
-            var destination = currentEntities.OfType<TBaseType>().SingleOrDefault(e => keyIsSameFunc(e, source));
+            var destination = currentEntities.OfType<BaseModel>().SingleOrDefault(e => e.Id == source.Id);
             if (destination != null)
                 UpdateEntity(source, destination);
             else
@@ -142,21 +112,21 @@ namespace Cauca.EntityUpdater
             }
         }
 
-        protected virtual TBaseType CreateCopy(TBaseType original)
+        protected virtual BaseModel CreateCopy(BaseModel original)
         {
-            var copy = (TBaseType)Activator.CreateInstance(original.GetType());
-            UpdateValues(original, copy);
+            var copy = (BaseModel)Activator.CreateInstance(original.GetType());
+            PropertiesUpdater.UpdateValues(original, copy);
             UpdateCopyableCollections(original, copy);
             return copy;
         }
 
-        protected virtual void UpdateEntity(TBaseType source, TBaseType destination)
+        protected virtual void UpdateEntity(BaseModel source, BaseModel destination)
         {
-            UpdateValues(source, destination);
+	        PropertiesUpdater.UpdateValues(source, destination);
             UpdateCopyableCollections(source, destination);
         }
 
-        protected virtual List<PropertyInfo> GetCopyableCollection(TBaseType entity)
+        protected virtual List<PropertyInfo> GetCopyableCollection(BaseModel entity)
         {
             var propertiesCollection = entity.GetType().GetProperties()
                 .Where(property => property.PropertyType.GetInterfaces().Contains(typeof(IEnumerable)) && property.PropertyType.IsGenericType && property.GetValue(entity, null) != null).ToList();
@@ -165,52 +135,7 @@ namespace Cauca.EntityUpdater
 
         public static IList GetCollectionByPropertyName(object src, string propertyName)
         {
-	        return GetPropertyValueByPropertyName(src, propertyName) as IList;
-        }
-
-        protected void UpdateValues(TBaseType source, TBaseType destination)
-        {
-            var entityType = source.GetType();
-            var sourceProps = GetNonNavigationReadableProperties(entityType);
-            var destinationProps = GetNonNavigationWritableProperties(entityType);
-
-            CopyProperties(source, destination, sourceProps, destinationProps);
-        }
-
-        private static void CopyProperties(TBaseType source, TBaseType destination, PropertyInfo[] sourceProps, PropertyInfo[] destinationProps)
-        {
-            foreach (var sourceProp in sourceProps)
-            {
-                CopyProperty(source, destination, destinationProps, sourceProp);
-            }
-        }
-
-        private static void CopyProperty(TBaseType source, TBaseType destination, PropertyInfo[] destinationProps, PropertyInfo sourceProp)
-        {
-            var p = destinationProps.FirstOrDefault(x => x.Name == sourceProp.Name);
-            if (p != null && p.CanWrite)
-            {
-                p.SetValue(destination, sourceProp.GetValue(source, null), null);
-            }
-        }
-
-        protected PropertyInfo[] GetNonNavigationWritableProperties(Type entityType)
-        {
-            return entityType.GetProperties()
-                .Where(p => p.CanWrite && !IsNavigationProperty(entityType, p))
-                .ToArray();
-        }
-
-        protected PropertyInfo[] GetNonNavigationReadableProperties(Type entityType)
-        {
-            return entityType.GetProperties()
-                .Where(p => p.CanRead && !IsNavigationProperty(entityType, p))
-                .ToArray();
-        }
-
-        protected static bool IsNavigationProperty(Type entityType, PropertyInfo p)
-        {
-            return (typeof(IEnumerable).IsAssignableFrom(p.PropertyType) || p.PropertyType.IsClass) && p.PropertyType != typeof(string);
+            return src.GetType().GetProperty(propertyName)?.GetValue(src, null) as IList;
         }
     }
 }

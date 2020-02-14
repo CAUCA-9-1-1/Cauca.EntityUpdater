@@ -1,9 +1,8 @@
-﻿using Cause.CustomerPortal.Models.Base;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Cause.CustomerPortal.ServiceLayer.Tests.Mocks.EntityUpdaterTestMocks
+namespace Cauca.EntityUpdater.Tests.EntityUpdaterTestMocks
 {
-    public class Child : BaseModelWithActiveFields
+    public class Child : BaseModel
     {
         public List<Friend> Friends { get; set; }
     }

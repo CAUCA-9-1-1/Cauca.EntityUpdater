@@ -2,3 +2,7 @@ D:\dev\Cauca.EntityUpdater\Cauca.EntityUpdater.Tests\bin\Debug\netcoreapp3.1\Cau
 D:\dev\Cauca.EntityUpdater\Cauca.EntityUpdater.Tests\obj\Debug\netcoreapp3.1\Cauca.EntityUpdater.Tests.csprojAssemblyReference.cache
 D:\dev\Cauca.EntityUpdater\Cauca.EntityUpdater.Tests\obj\Debug\netcoreapp3.1\Cauca.EntityUpdater.Tests.AssemblyInfoInputs.cache
 D:\dev\Cauca.EntityUpdater\Cauca.EntityUpdater.Tests\obj\Debug\netcoreapp3.1\Cauca.EntityUpdater.Tests.AssemblyInfo.cs
+D:\dev\Cauca.EntityUpdater\Cauca.EntityUpdater.Tests\bin\Debug\netcoreapp3.1\Cauca.EntityUpdater.Tests.deps.json
+D:\dev\Cauca.EntityUpdater\Cauca.EntityUpdater.Tests\bin\Debug\netcoreapp3.1\Cauca.EntityUpdater.Tests.dll
+D:\dev\Cauca.EntityUpdater\Cauca.EntityUpdater.Tests\bin\Debug\netcoreapp3.1\Cauca.EntityUpdater.pdb
+D:\dev\Cauca.EntityUpdater\Cauca.EntityUpdater.Tests\obj\Debug\netcoreapp3.1\Cauca.EntityUpdater.Tests.csproj.CopyComplete

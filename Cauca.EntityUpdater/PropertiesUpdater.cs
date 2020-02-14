@@ -3,7 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.Reflection;
 
-namespace Cause.CustomerPortal.ServiceLayer.Base
+namespace Cauca.EntityUpdater
 {
     public static class PropertiesUpdater
     {

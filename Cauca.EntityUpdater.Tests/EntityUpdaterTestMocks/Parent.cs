@@ -1,15 +1,8 @@
-﻿using Cause.CustomerPortal.Models.Base;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Cause.CustomerPortal.ServiceLayer.Tests.Mocks.EntityUpdaterTestMocks
+namespace Cauca.EntityUpdater.Tests.EntityUpdaterTestMocks
 {
-    public enum SomeEnum
-    {
-        Value1,
-        Value2
-    }
-
-    public class Parent : BaseModelWithActiveFields
+    public class Parent : BaseModel
     {
         public string ReadOnlyValue { get; } = "8";
         public string WriteOnlyValue { private get; set; }

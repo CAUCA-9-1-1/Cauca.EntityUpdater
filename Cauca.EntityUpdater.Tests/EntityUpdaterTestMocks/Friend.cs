@@ -1,8 +1,6 @@
-﻿using Cause.CustomerPortal.Models.Base;
-
-namespace Cause.CustomerPortal.ServiceLayer.Tests.Mocks.EntityUpdaterTestMocks
+﻿namespace Cauca.EntityUpdater.Tests.EntityUpdaterTestMocks
 {
-    public class Friend : BaseModelWithActiveFields
+    public class Friend : BaseModel
     {
     }
 }
